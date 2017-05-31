@@ -13,6 +13,8 @@
 #include "wolfssl/wolfcrypt/aes.h"
 #include "wolfssl/wolfcrypt/rsa.h"
 #include "wolfssl/wolfcrypt/random.h"
+#include "wolfcrypt/test/test.h"
+#include "wolfcrypt/benchmark/benchmark.h"
 
 #include <stdlib.h> /* for size_t */
 
@@ -22,6 +24,8 @@
 extern "C" {
 #endif
 
+void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_print_string, (const char* str));
+void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_current_time, (double* time));
 
 sgx_status_t wc_sha256_init(sgx_enclave_id_t eid, int* retval, Sha256* sha256);
 sgx_status_t wc_sha256_update(sgx_enclave_id_t eid, int* retval, Sha256* sha256, byte* buf, int bufSz);
@@ -33,6 +37,8 @@ sgx_status_t wc_rsa_encrypt(sgx_enclave_id_t eid, int* retval, const byte* m, wo
 sgx_status_t wc_rsa_decrypt(sgx_enclave_id_t eid, int* retval, const byte* in, word32 inSz, byte* out, word32 mSz, RsaKey* key);
 sgx_status_t wc_rsa_init(sgx_enclave_id_t eid, int* retval, RsaKey* rsa);
 sgx_status_t wc_rsa_free(sgx_enclave_id_t eid, int* retval, RsaKey* rsa);
+sgx_status_t wc_test(sgx_enclave_id_t eid, int* retval, void* args);
+sgx_status_t wc_benchmark_test(sgx_enclave_id_t eid, int* retval, void* args);
 
 #ifdef __cplusplus
 }

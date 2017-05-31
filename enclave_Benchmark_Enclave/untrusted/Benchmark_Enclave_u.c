@@ -82,12 +82,49 @@ typedef struct ms_wc_rsa_free_t {
 	RsaKey* ms_rsa;
 } ms_wc_rsa_free_t;
 
+typedef struct ms_wc_test_t {
+	int ms_retval;
+	void* ms_args;
+} ms_wc_test_t;
+
+typedef struct ms_wc_benchmark_test_t {
+	int ms_retval;
+	void* ms_args;
+} ms_wc_benchmark_test_t;
+
+typedef struct ms_ocall_print_string_t {
+	char* ms_str;
+} ms_ocall_print_string_t;
+
+typedef struct ms_ocall_current_time_t {
+	double* ms_time;
+} ms_ocall_current_time_t;
+
+static sgx_status_t SGX_CDECL Benchmark_Enclave_ocall_print_string(void* pms)
+{
+	ms_ocall_print_string_t* ms = SGX_CAST(ms_ocall_print_string_t*, pms);
+	ocall_print_string((const char*)ms->ms_str);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL Benchmark_Enclave_ocall_current_time(void* pms)
+{
+	ms_ocall_current_time_t* ms = SGX_CAST(ms_ocall_current_time_t*, pms);
+	ocall_current_time(ms->ms_time);
+
+	return SGX_SUCCESS;
+}
+
 static const struct {
 	size_t nr_ocall;
-	void * table[1];
+	void * table[2];
 } ocall_table_Benchmark_Enclave = {
-	0,
-	{ NULL },
+	2,
+	{
+		(void*)Benchmark_Enclave_ocall_print_string,
+		(void*)Benchmark_Enclave_ocall_current_time,
+	}
 };
 sgx_status_t wc_sha256_init(sgx_enclave_id_t eid, int* retval, Sha256* sha256)
 {
@@ -216,6 +253,26 @@ sgx_status_t wc_rsa_free(sgx_enclave_id_t eid, int* retval, RsaKey* rsa)
 	ms_wc_rsa_free_t ms;
 	ms.ms_rsa = rsa;
 	status = sgx_ecall(eid, 9, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t wc_test(sgx_enclave_id_t eid, int* retval, void* args)
+{
+	sgx_status_t status;
+	ms_wc_test_t ms;
+	ms.ms_args = args;
+	status = sgx_ecall(eid, 10, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t wc_benchmark_test(sgx_enclave_id_t eid, int* retval, void* args)
+{
+	sgx_status_t status;
+	ms_wc_benchmark_test_t ms;
+	ms.ms_args = args;
+	status = sgx_ecall(eid, 11, &ocall_table_Benchmark_Enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }

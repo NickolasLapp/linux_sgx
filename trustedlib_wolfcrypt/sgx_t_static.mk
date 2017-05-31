@@ -44,19 +44,56 @@ endif
 Crypto_Library_Name := sgx_tcrypto
 
 Wolfcrypt_C_Extra_Flags := -DWOLFSSL_SGX
-Wolfcrypt_C_Files := static_trusted/wolfssl/wolfcrypt/src/aes.c\
-					 static_trusted/wolfssl/wolfcrypt/src/asn.c\
-					 static_trusted/wolfssl/wolfcrypt/src/hash.c\
-					 static_trusted/wolfssl/wolfcrypt/src/hmac.c\
-					 static_trusted/wolfssl/wolfcrypt/src/memory.c\
-					 static_trusted/wolfssl/wolfcrypt/src/pwdbased.c\
-					 static_trusted/wolfssl/wolfcrypt/src/random.c\
-					 static_trusted/wolfssl/wolfcrypt/src/rsa.c\
-					 static_trusted/wolfssl/wolfcrypt/src/sha256.c\
-					 static_trusted/wolfssl/wolfcrypt/src/tfm.c
+Wolfcrypt_C_Files :=static_trusted/wolfssl/wolfcrypt/src/aes.c\
+					static_trusted/wolfssl/wolfcrypt/src/arc4.c\
+					static_trusted/wolfssl/wolfcrypt/src/asn.c\
+					static_trusted/wolfssl/wolfcrypt/src/blake2b.c\
+					static_trusted/wolfssl/wolfcrypt/src/camellia.c\
+					static_trusted/wolfssl/wolfcrypt/src/coding.c\
+					static_trusted/wolfssl/wolfcrypt/src/chacha.c\
+					static_trusted/wolfssl/wolfcrypt/src/chacha20_poly1305.c\
+					static_trusted/wolfssl/src/crl.c\
+					static_trusted/wolfssl/wolfcrypt/src/des3.c\
+					static_trusted/wolfssl/wolfcrypt/src/dh.c\
+					static_trusted/wolfssl/wolfcrypt/src/ecc.c\
+					static_trusted/wolfssl/wolfcrypt/src/error.c\
+					static_trusted/wolfssl/wolfcrypt/src/hash.c\
+					static_trusted/wolfssl/wolfcrypt/src/hc128.c\
+					static_trusted/wolfssl/wolfcrypt/src/hmac.c\
+					static_trusted/wolfssl/wolfcrypt/src/integer.c\
+					static_trusted/wolfssl/src/internal.c\
+					static_trusted/wolfssl/src/io.c\
+					static_trusted/wolfssl/src/keys.c\
+					static_trusted/wolfssl/wolfcrypt/src/logging.c\
+					static_trusted/wolfssl/wolfcrypt/src/md4.c\
+					static_trusted/wolfssl/wolfcrypt/src/md5.c\
+					static_trusted/wolfssl/wolfcrypt/src/memory.c\
+					static_trusted/wolfssl/src/ocsp.c\
+					static_trusted/wolfssl/wolfcrypt/src/pkcs7.c\
+					static_trusted/wolfssl/wolfcrypt/src/pkcs12.c\
+					static_trusted/wolfssl/wolfcrypt/src/poly1305.c\
+					static_trusted/wolfssl/wolfcrypt/src/wc_port.c\
+					static_trusted/wolfssl/wolfcrypt/src/wolfmath.c\
+					static_trusted/wolfssl/wolfcrypt/src/pwdbased.c\
+					static_trusted/wolfssl/wolfcrypt/src/rabbit.c\
+					static_trusted/wolfssl/wolfcrypt/src/random.c\
+					static_trusted/wolfssl/wolfcrypt/src/ripemd.c\
+					static_trusted/wolfssl/wolfcrypt/src/rsa.c\
+					static_trusted/wolfssl/wolfcrypt/src/sha.c\
+					static_trusted/wolfssl/wolfcrypt/src/sha256.c\
+					static_trusted/wolfssl/wolfcrypt/src/sha512.c\
+					static_trusted/wolfssl/wolfcrypt/src/signature.c\
+					static_trusted/wolfssl/src/ssl.c\
+					static_trusted/wolfssl/src/tls.c\
+					static_trusted/wolfssl/wolfcrypt/src/wc_encrypt.c\
+					static_trusted/wolfssl/wolfcrypt/src/wolfevent.c\
+					static_trusted/wolfssl/wolfcrypt/test/test.c\
+					static_trusted/wolfssl/wolfcrypt/benchmark/benchmark.c
 
 Wolfcrypt_Include_Paths := -I./static_trusted/wolfssl/ \
-						   -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport	
+						   -I./static_trusted/wolfssl/wolfcrypt/test/ \
+						   -I./static_trusted/wolfssl/wolfcrypt/benchmark/ \
+						   -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
 
 
 Flags_Just_For_C := -Wno-implicit-function-declaration -std=c11
@@ -102,7 +139,7 @@ static_trusted/%.o: static_trusted/%.c
 	@echo "CC  <=  $<"
 
 libwolfcrypt.sgx.static.lib.a: static_trusted/wolfcrypt_t.h $(Wolfcrypt_C_Objects)
-	ar rcs libwolfcrypt.sgx.static.lib.a $(Wolfcrypt_Cpp_Objects) $(Wolfcrypt_C_Objects)  
+	ar rcs libwolfcrypt.sgx.static.lib.a $(Wolfcrypt_Cpp_Objects) $(Wolfcrypt_C_Objects)
 	@echo "LINK =>  $@"
 
 clean:

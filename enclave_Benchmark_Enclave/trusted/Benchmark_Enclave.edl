@@ -9,6 +9,9 @@ enclave {
 	include "wolfssl/wolfcrypt/rsa.h"
 	include "wolfssl/wolfcrypt/random.h"
 
+    include "wolfcrypt/test/test.h"
+    include "wolfcrypt/benchmark/benchmark.h"
+
 
     trusted {
 
@@ -40,10 +43,14 @@ enclave {
 		public int wc_rsa_decrypt([user_check]const byte* in, word32 inSz, [user_check]byte* out, word32 mSz, [user_check]RsaKey* key);
 		public int wc_rsa_init([user_check]RsaKey* rsa);
 		public int wc_rsa_free([user_check]RsaKey* rsa);
+
+        public int wc_test([user_check]void* args);
+        public int wc_benchmark_test([user_check]void* args);
     };
 
     untrusted {
         /* define OCALLs here. */
-
+        void ocall_print_string([in, string] const char* str);
+        void ocall_current_time([user_check] double* time);
     };
 };

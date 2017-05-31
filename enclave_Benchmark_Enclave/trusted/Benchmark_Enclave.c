@@ -20,8 +20,7 @@ int wc_sha256_update(Sha256* sha256, byte* buf, int bufSz)
 
 int wc_sha256_final(Sha256* sha256, byte* digest)
 {
-	return wc_Sha256Final(sha256, digest);
-}
+	return wc_Sha256Final(sha256, digest); }
 
 
 int wc_aesgcm_setKey(Aes* aes, const byte* key, word32 sz)
@@ -55,6 +54,16 @@ int wc_rsa_decrypt(const byte* in, word32 inSz, byte* m, word32 mSz, RsaKey* rsa
 int wc_rsa_free(RsaKey* rsaKey)
 {
 	return wc_FreeRsaKey(rsaKey);
+}
+
+int wc_test(void* args)
+{
+	return wolfcrypt_test(args);
+}
+
+int wc_benchmark_test(void* args)
+{
+    return benchmark_test(args);
 }
 
 
@@ -98,4 +107,21 @@ int wc_rsa_init(RsaKey* rsaKey)
 	#endif
 
 	return 0;
+}
+
+void printf(const char *fmt, ...)
+{
+    char buf[BUFSIZ] = {'\0'};
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buf, BUFSIZ, fmt, ap);
+    va_end(ap);
+    ocall_print_string(buf);
+}
+
+double current_time(void)
+{
+    double curr;
+    ocall_current_time(&curr);
+    return curr;
 }

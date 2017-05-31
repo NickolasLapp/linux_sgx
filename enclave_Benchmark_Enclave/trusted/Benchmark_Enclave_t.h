@@ -12,6 +12,8 @@
 #include "wolfssl/wolfcrypt/aes.h"
 #include "wolfssl/wolfcrypt/rsa.h"
 #include "wolfssl/wolfcrypt/random.h"
+#include "wolfcrypt/test/test.h"
+#include "wolfcrypt/benchmark/benchmark.h"
 
 #include <stdlib.h> /* for size_t */
 
@@ -32,7 +34,11 @@ int wc_rsa_encrypt(const byte* m, word32 mSz, byte* out, word32 outSz, RsaKey* k
 int wc_rsa_decrypt(const byte* in, word32 inSz, byte* out, word32 mSz, RsaKey* key);
 int wc_rsa_init(RsaKey* rsa);
 int wc_rsa_free(RsaKey* rsa);
+int wc_test(void* args);
+int wc_benchmark_test(void* args);
 
+sgx_status_t SGX_CDECL ocall_print_string(const char* str);
+sgx_status_t SGX_CDECL ocall_current_time(double* time);
 
 #ifdef __cplusplus
 }

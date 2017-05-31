@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+void printf(const char *fmt, ...);
+double current_time(void);
+
 #if defined(__cplusplus)
 }
 #endif

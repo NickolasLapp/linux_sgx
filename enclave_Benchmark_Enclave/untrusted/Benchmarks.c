@@ -363,10 +363,18 @@ static int rsa_decrypt_print(sgx_enclave_id_t id, byte* m, word32 mSz, const byt
 	return 0;
 }
 
-int main(int argc, char* argv[])
+typedef struct func_args {
+    int    argc;
+    char** argv;
+    int    return_code;
+} func_args;
+
+
+int main(int argc, char* argv[]) /* not using since just testing w/ wc_test */
 {
 	sgx_enclave_id_t id;
 	sgx_launch_token_t t;
+    func_args args = { 0 };
 
 	int ret = 0;
 	int sgxStatus = 0;
@@ -392,6 +400,19 @@ int main(int argc, char* argv[])
 		free_resources(plain, cipher);
 		return 1;
 	}
+
+    printf("\nCrypt Test:\n");
+    wc_test(id, &sgxStatus, &args);
+    printf("Crypt Test: Return code %d\n", args.return_code);
+    printf("\n\n\n");
+
+    memset(&args,0,sizeof(args));
+
+    printf("\nBenchmark Test:\n");
+    wc_benchmark_test(id, &sgxStatus, &args);
+    printf("Benchmark Test: Return code %d\n", args.return_code);
+    return 0;
+
 
 	/* test if only printing off times */
 	if (argc > 1) {
@@ -479,4 +500,24 @@ int main(int argc, char* argv[])
 	free_resources(plain, cipher);
 	return 0;
 }
+
+void ocall_print_string(const char *str)
+{
+    /* Proxy/Bridge will check the length and null-terminate 
+     * the input string to prevent buffer overflow. 
+     */
+    printf("%s", str);
+}
+
+void ocall_current_time(double* time)
+{
+    struct timeval tv;
+    if(!time) return;
+    double curr;
+	gettimeofday(&tv,NULL);
+    curr = (double)(1000000 * tv.tv_sec + tv.tv_usec)/1000000.0;
+    *time=curr;
+    return;
+}
+
 

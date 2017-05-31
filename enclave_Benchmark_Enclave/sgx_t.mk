@@ -43,8 +43,8 @@ endif
 
 Crypto_Library_Name := sgx_tcrypto
 
-Benchmark_Enclave_C_Files := trusted/Benchmark_Enclave.c 
-Benchmark_Enclave_Include_Paths := -IInclude -Itrusted -I../trustedlib_wolfcrypt/static_trusted/wolfssl -I../trustedlib_wolfcrypt/static_trusted/wolfssl/wolfssl -I../trustedlib_wolfcrypt/static_trusted/wolfssl/wolfssl/wolfcrypt -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
+Benchmark_Enclave_C_Files := trusted/Benchmark_Enclave.c
+Benchmark_Enclave_Include_Paths := -IInclude -Itrusted -I../trustedlib_wolfcrypt/static_trusted/wolfssl -I../trustedlib_wolfcrypt/static_trusted/wolfssl/wolfssl -I../trustedlib_wolfcrypt/static_trusted/wolfssl/wolfssl/wolfcrypt -I../trustedlib_wolfcrypt/static_trusted/wolfcrypt/test -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
 Wolfcrypt_C_Extra_Flags := -DWOLFSSL_SGX
 
 
