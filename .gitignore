@@ -1,4 +1,5 @@
-./trustedlib_wolfcrypt/static_trusted/wolfssl
+trustedlib_wolfcrypt/static_trusted/wolfssl
 **/*.so
+**/*.o
 **/*.a
 enclave_Benchmark_Enclave/Benchmarks
