@@ -55,6 +55,7 @@ Wolfcrypt_C_Files :=static_trusted/wolfssl/wolfcrypt/src/aes.c\
 					static_trusted/wolfssl/src/crl.c\
 					static_trusted/wolfssl/wolfcrypt/src/des3.c\
 					static_trusted/wolfssl/wolfcrypt/src/dh.c\
+					static_trusted/wolfssl/wolfcrypt/src/tfm.c\
 					static_trusted/wolfssl/wolfcrypt/src/ecc.c\
 					static_trusted/wolfssl/wolfcrypt/src/error.c\
 					static_trusted/wolfssl/wolfcrypt/src/hash.c\
@@ -79,6 +80,7 @@ Wolfcrypt_C_Files :=static_trusted/wolfssl/wolfcrypt/src/aes.c\
 					static_trusted/wolfssl/wolfcrypt/src/random.c\
 					static_trusted/wolfssl/wolfcrypt/src/ripemd.c\
 					static_trusted/wolfssl/wolfcrypt/src/rsa.c\
+					static_trusted/wolfssl/wolfcrypt/src/dsa.c\
 					static_trusted/wolfssl/wolfcrypt/src/sha.c\
 					static_trusted/wolfssl/wolfcrypt/src/sha256.c\
 					static_trusted/wolfssl/wolfcrypt/src/sha512.c\

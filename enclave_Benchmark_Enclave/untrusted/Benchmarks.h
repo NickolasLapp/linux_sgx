@@ -23,6 +23,9 @@
 #define BENCHMARKS_H
 
 #include "sgx_urts.h"	 /* Manages Enclave */
+#include <sys/types.h> /* for send/recv */
+#include <sys/socket.h> /* for send/recv */
+
 #include "Benchmark_Enclave_u.h"   /* contains untrusted wrapper functions used to call enclave functions*/
 
 #define BENCH_RSA

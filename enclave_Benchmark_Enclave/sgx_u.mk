@@ -42,7 +42,7 @@ else
 	Urts_Library_Name := sgx_urts
 endif
 
-App_C_Files := $(UNTRUSTED_DIR)/Benchmarks.c
+App_C_Files := $(UNTRUSTED_DIR)/Benchmarks.c $(UNTRUSTED_DIR)/client-tls.c
 Wolfcrypt_Header_Path := ../trustedlib_wolfcrypt/static_trusted/wolfssl/
 App_Include_Paths := -I$(Wolfcrypt_Header_Path) -IInclude -I$(UNTRUSTED_DIR) -I$(SGX_SDK)/include
 Wolfcrypt_C_Extra_Flags := -DWOLFSSL_SGX
@@ -115,12 +115,12 @@ $(UNTRUSTED_DIR)/Benchmark_Enclave_u.o: $(UNTRUSTED_DIR)/Benchmark_Enclave_u.c
 	@echo "CC   <=  $<"
 
 $(UNTRUSTED_DIR)/%.o: $(UNTRUSTED_DIR)/%.c
-	@echo $(CXX) $(App_C_Flags) -c $< -o $@
-	@$(CXX) $(App_C_Flags) -c $< -o $@
-	@echo "CXX  <=  $<"
+	@echo $(CC) $(App_C_Flags) -c $< -o $@
+	@$(CC) $(App_C_Flags) -c $< -o $@
+	@echo "CC  <=  $<"
 
 Benchmarks: $(UNTRUSTED_DIR)/Benchmark_Enclave_u.o $(App_C_Objects)
-	@$(CXX) $^ -o $@ $(App_Link_Flags)
+	@$(CC) $^ -o $@ $(App_Link_Flags)
 	@echo "LINK =>  $@"
 
 

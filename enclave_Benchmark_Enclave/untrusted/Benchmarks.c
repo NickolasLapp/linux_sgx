@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 #include "Benchmarks.h" /* contains include of Enclave_u.h which has wolfSSL header files */
+#include "client-tls.h"
 
 /* Check settings of wolfSSL */
 #if !defined(HAVE_AESGCM) || defined(NO_RSA) || defined(NO_SHA256)
@@ -401,7 +402,7 @@ int main(int argc, char* argv[]) /* not using since just testing w/ wc_test */
 		return 1;
 	}
 
-    printf("\nCrypt Test:\n");
+/*    printf("\nCrypt Test:\n");
     wc_test(id, &sgxStatus, &args);
     printf("Crypt Test: Return code %d\n", args.return_code);
     printf("\n\n\n");
@@ -410,7 +411,11 @@ int main(int argc, char* argv[]) /* not using since just testing w/ wc_test */
 
     printf("\nBenchmark Test:\n");
     wc_benchmark_test(id, &sgxStatus, &args);
-    printf("Benchmark Test: Return code %d\n", args.return_code);
+    printf("Benchmark Test: Return code %d\n", args.return_code);*/
+
+    printf("\nClient Test:\n");
+    client_connect(id);
+
     return 0;
 
 
@@ -520,4 +525,21 @@ void ocall_current_time(double* time)
     return;
 }
 
+void ocall_low_res_time(int* time)
+{
+    struct timeval tv;
+    if(!time) return;
+    *time = tv.tv_sec;
+    return;
+}
+
+size_t ocall_recv(int sockfd, void *buf, size_t len, int flags)
+{
+    return recv(sockfd, buf, len, flags);
+}
+
+size_t ocall_send(int sockfd, const void *buf, size_t len, int flags)
+{
+    return send(sockfd, buf, len, flags);
+}
 

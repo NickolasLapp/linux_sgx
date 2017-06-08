@@ -92,6 +92,92 @@ typedef struct ms_wc_benchmark_test_t {
 	void* ms_args;
 } ms_wc_benchmark_test_t;
 
+typedef struct ms_enc_wolfSSL_Init_t {
+	int ms_retval;
+} ms_enc_wolfSSL_Init_t;
+
+
+typedef struct ms_enc_wolfTLSv1_2_client_method_t {
+	WOLFSSL_METHOD* ms_retval;
+} ms_enc_wolfTLSv1_2_client_method_t;
+
+typedef struct ms_enc_wolfSSL_CTX_new_t {
+	WOLFSSL_CTX* ms_retval;
+	WOLFSSL_METHOD* ms_method;
+} ms_enc_wolfSSL_CTX_new_t;
+
+typedef struct ms_enc_wolfSSL_CTX_use_PrivateKey_buffer_t {
+	int ms_retval;
+	WOLFSSL_CTX* ms_ctx;
+	unsigned char* ms_buf;
+	long int ms_sz;
+	int ms_type;
+} ms_enc_wolfSSL_CTX_use_PrivateKey_buffer_t;
+
+typedef struct ms_enc_wolfSSL_CTX_load_verify_buffer_t {
+	int ms_retval;
+	WOLFSSL_CTX* ms_ctx;
+	unsigned char* ms_buf;
+	long int ms_sz;
+	int ms_type;
+} ms_enc_wolfSSL_CTX_load_verify_buffer_t;
+
+typedef struct ms_enc_wolfSSL_CTX_use_certificate_chain_buffer_format_t {
+	int ms_retval;
+	WOLFSSL_CTX* ms_ctx;
+	unsigned char* ms_buf;
+	long int ms_sz;
+	int ms_type;
+} ms_enc_wolfSSL_CTX_use_certificate_chain_buffer_format_t;
+
+typedef struct ms_enc_wolfSSL_new_t {
+	WOLFSSL* ms_retval;
+	WOLFSSL_CTX* ms_ctx;
+} ms_enc_wolfSSL_new_t;
+
+typedef struct ms_enc_wolfSSL_set_fd_t {
+	int ms_retval;
+	WOLFSSL* ms_ssl;
+	int ms_fd;
+} ms_enc_wolfSSL_set_fd_t;
+
+typedef struct ms_enc_wolfSSL_connect_t {
+	int ms_retval;
+	WOLFSSL* ms_ssl;
+} ms_enc_wolfSSL_connect_t;
+
+typedef struct ms_enc_wolfSSL_write_t {
+	int ms_retval;
+	WOLFSSL* ms_ssl;
+	void* ms_in;
+	int ms_sz;
+} ms_enc_wolfSSL_write_t;
+
+typedef struct ms_enc_wolfSSL_get_error_t {
+	int ms_retval;
+	WOLFSSL* ms_ssl;
+	int ms_ret;
+} ms_enc_wolfSSL_get_error_t;
+
+typedef struct ms_enc_wolfSSL_read_t {
+	int ms_retval;
+	WOLFSSL* ms_ssl;
+	void* ms_out;
+	int ms_sz;
+} ms_enc_wolfSSL_read_t;
+
+typedef struct ms_enc_wolfSSL_free_t {
+	WOLFSSL* ms_ssl;
+} ms_enc_wolfSSL_free_t;
+
+typedef struct ms_enc_wolfSSL_CTX_free_t {
+	WOLFSSL_CTX* ms_ctx;
+} ms_enc_wolfSSL_CTX_free_t;
+
+typedef struct ms_enc_wolfSSL_Cleanup_t {
+	int ms_retval;
+} ms_enc_wolfSSL_Cleanup_t;
+
 typedef struct ms_ocall_print_string_t {
 	char* ms_str;
 } ms_ocall_print_string_t;
@@ -99,6 +185,28 @@ typedef struct ms_ocall_print_string_t {
 typedef struct ms_ocall_current_time_t {
 	double* ms_time;
 } ms_ocall_current_time_t;
+
+typedef struct ms_ocall_low_res_time_t {
+	int* ms_time;
+} ms_ocall_low_res_time_t;
+
+typedef struct ms_ocall_recv_t {
+	size_t ms_retval;
+	int ocall_errno;
+	int ms_sockfd;
+	void* ms_buf;
+	size_t ms_len;
+	int ms_flags;
+} ms_ocall_recv_t;
+
+typedef struct ms_ocall_send_t {
+	size_t ms_retval;
+	int ocall_errno;
+	int ms_sockfd;
+	void* ms_buf;
+	size_t ms_len;
+	int ms_flags;
+} ms_ocall_send_t;
 
 static sgx_status_t SGX_CDECL Benchmark_Enclave_ocall_print_string(void* pms)
 {
@@ -116,14 +224,41 @@ static sgx_status_t SGX_CDECL Benchmark_Enclave_ocall_current_time(void* pms)
 	return SGX_SUCCESS;
 }
 
+static sgx_status_t SGX_CDECL Benchmark_Enclave_ocall_low_res_time(void* pms)
+{
+	ms_ocall_low_res_time_t* ms = SGX_CAST(ms_ocall_low_res_time_t*, pms);
+	ocall_low_res_time(ms->ms_time);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL Benchmark_Enclave_ocall_recv(void* pms)
+{
+	ms_ocall_recv_t* ms = SGX_CAST(ms_ocall_recv_t*, pms);
+	ms->ms_retval = ocall_recv(ms->ms_sockfd, ms->ms_buf, ms->ms_len, ms->ms_flags);
+	ms->ocall_errno = errno;
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL Benchmark_Enclave_ocall_send(void* pms)
+{
+	ms_ocall_send_t* ms = SGX_CAST(ms_ocall_send_t*, pms);
+	ms->ms_retval = ocall_send(ms->ms_sockfd, (const void*)ms->ms_buf, ms->ms_len, ms->ms_flags);
+	ms->ocall_errno = errno;
+	return SGX_SUCCESS;
+}
+
 static const struct {
 	size_t nr_ocall;
-	void * table[2];
+	void * table[5];
 } ocall_table_Benchmark_Enclave = {
-	2,
+	5,
 	{
 		(void*)Benchmark_Enclave_ocall_print_string,
 		(void*)Benchmark_Enclave_ocall_current_time,
+		(void*)Benchmark_Enclave_ocall_low_res_time,
+		(void*)Benchmark_Enclave_ocall_recv,
+		(void*)Benchmark_Enclave_ocall_send,
 	}
 };
 sgx_status_t wc_sha256_init(sgx_enclave_id_t eid, int* retval, Sha256* sha256)
@@ -273,6 +408,173 @@ sgx_status_t wc_benchmark_test(sgx_enclave_id_t eid, int* retval, void* args)
 	ms_wc_benchmark_test_t ms;
 	ms.ms_args = args;
 	status = sgx_ecall(eid, 11, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_Init(sgx_enclave_id_t eid, int* retval)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_Init_t ms;
+	status = sgx_ecall(eid, 12, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_Debugging_ON(sgx_enclave_id_t eid)
+{
+	sgx_status_t status;
+	status = sgx_ecall(eid, 13, &ocall_table_Benchmark_Enclave, NULL);
+	return status;
+}
+
+sgx_status_t enc_wolfTLSv1_2_client_method(sgx_enclave_id_t eid, WOLFSSL_METHOD** retval)
+{
+	sgx_status_t status;
+	ms_enc_wolfTLSv1_2_client_method_t ms;
+	status = sgx_ecall(eid, 14, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_CTX_new(sgx_enclave_id_t eid, WOLFSSL_CTX** retval, WOLFSSL_METHOD* method)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_CTX_new_t ms;
+	ms.ms_method = method;
+	status = sgx_ecall(eid, 15, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_CTX_use_PrivateKey_buffer(sgx_enclave_id_t eid, int* retval, WOLFSSL_CTX* ctx, const unsigned char* buf, long int sz, int type)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_CTX_use_PrivateKey_buffer_t ms;
+	ms.ms_ctx = ctx;
+	ms.ms_buf = (unsigned char*)buf;
+	ms.ms_sz = sz;
+	ms.ms_type = type;
+	status = sgx_ecall(eid, 16, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_CTX_load_verify_buffer(sgx_enclave_id_t eid, int* retval, WOLFSSL_CTX* ctx, const unsigned char* buf, long int sz, int type)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_CTX_load_verify_buffer_t ms;
+	ms.ms_ctx = ctx;
+	ms.ms_buf = (unsigned char*)buf;
+	ms.ms_sz = sz;
+	ms.ms_type = type;
+	status = sgx_ecall(eid, 17, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_CTX_use_certificate_chain_buffer_format(sgx_enclave_id_t eid, int* retval, WOLFSSL_CTX* ctx, const unsigned char* buf, long int sz, int type)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_CTX_use_certificate_chain_buffer_format_t ms;
+	ms.ms_ctx = ctx;
+	ms.ms_buf = (unsigned char*)buf;
+	ms.ms_sz = sz;
+	ms.ms_type = type;
+	status = sgx_ecall(eid, 18, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_new(sgx_enclave_id_t eid, WOLFSSL** retval, WOLFSSL_CTX* ctx)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_new_t ms;
+	ms.ms_ctx = ctx;
+	status = sgx_ecall(eid, 19, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_set_fd(sgx_enclave_id_t eid, int* retval, WOLFSSL* ssl, int fd)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_set_fd_t ms;
+	ms.ms_ssl = ssl;
+	ms.ms_fd = fd;
+	status = sgx_ecall(eid, 20, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_connect(sgx_enclave_id_t eid, int* retval, WOLFSSL* ssl)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_connect_t ms;
+	ms.ms_ssl = ssl;
+	status = sgx_ecall(eid, 21, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_write(sgx_enclave_id_t eid, int* retval, WOLFSSL* ssl, const void* in, int sz)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_write_t ms;
+	ms.ms_ssl = ssl;
+	ms.ms_in = (void*)in;
+	ms.ms_sz = sz;
+	status = sgx_ecall(eid, 22, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_get_error(sgx_enclave_id_t eid, int* retval, WOLFSSL* ssl, int ret)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_get_error_t ms;
+	ms.ms_ssl = ssl;
+	ms.ms_ret = ret;
+	status = sgx_ecall(eid, 23, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_read(sgx_enclave_id_t eid, int* retval, WOLFSSL* ssl, void* out, int sz)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_read_t ms;
+	ms.ms_ssl = ssl;
+	ms.ms_out = out;
+	ms.ms_sz = sz;
+	status = sgx_ecall(eid, 24, &ocall_table_Benchmark_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_free(sgx_enclave_id_t eid, WOLFSSL* ssl)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_free_t ms;
+	ms.ms_ssl = ssl;
+	status = sgx_ecall(eid, 25, &ocall_table_Benchmark_Enclave, &ms);
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_CTX_free(sgx_enclave_id_t eid, WOLFSSL_CTX* ctx)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_CTX_free_t ms;
+	ms.ms_ctx = ctx;
+	status = sgx_ecall(eid, 26, &ocall_table_Benchmark_Enclave, &ms);
+	return status;
+}
+
+sgx_status_t enc_wolfSSL_Cleanup(sgx_enclave_id_t eid, int* retval)
+{
+	sgx_status_t status;
+	ms_enc_wolfSSL_Cleanup_t ms;
+	status = sgx_ecall(eid, 27, &ocall_table_Benchmark_Enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
